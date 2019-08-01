@@ -14,7 +14,7 @@ export default {
     },
     async incrementAsync() {
       const { increment } = model();
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      await new Promise(resolve => setTimeout(resolve, 10000));
       increment();
     }
   })

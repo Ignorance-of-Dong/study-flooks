@@ -21,7 +21,7 @@ function Counter() {
         <button onClick={increment}>+</button>
         <button onClick={decrement}>-</button>
         <button onClick={incrementAsync}>
-          + async{incrementAsync.loading && "..."} {/**对于异步可以通过.loading来支持加载动画。配合组件使用 */}
+          + async{incrementAsync.loading && "??????s"} {/**对于异步可以通过.loading来支持加载动画。配合组件使用 */}
         </button>
       </footer>
     </>
