@@ -33,7 +33,7 @@
 
 > useEffect 给函数组件添加副作用，他和class组件中的componentDidMount、componentDidUpdate 和 componentWillUnmount具有相同的用途
 
-### 实现componentDidMount 和 componentDidUpdate副作用函数
+### 实现componentDidMount 副作用函数
 
   ```
     useEffect(() => {
@@ -43,7 +43,17 @@
 
   ```
 
-### 实现componentWillUnmount
+### 实现componentDidUpdate 副作用函数
+
+  ```
+    useEffect(() => {
+      // 使用浏览器的 API 更新页面标题
+      document.title = `You clicked ${count} times`;
+    }, [count]); // 只在count发生改变的情况下调用
+
+  ```
+
+### 实现componentWillUnmount 副作用函数
 
   ```
     useEffect(() => {
