@@ -1,5 +1,11 @@
 # Hook 
 
+
+
+**有状态的组件没有渲染，有渲染的组件没有状态。在现在回过头来看，这个原则会为我们后续向Hooks的迁移提供非常大的便利。**
+
+
+
 ## Hook简介
 
 > Hook是react16.8的新增特性，可以在不编写class类的情况下使用state以及react的其他特性
@@ -59,7 +65,7 @@
 
   ```
 
-### 实现componentWillUnmount 副作用函数+
+### 实现componentWillUnmount 副作用函数
 
   ```
     useEffect(() => {
@@ -77,3 +83,83 @@
 - userEffect传入的函数，return是在组件卸载的时候执行的
 - userEffect的执行，是由他的第二参数来控制的，而且第二的参数必须是一个数组，react会对数组中的每一项与上次的数组进行比较，如果不同，则才会去执行函数
 - userEffect采用的是异步的方案执行，类似于js中的setTimeout，将userEffect进行异步执行
+
+
+**实用之处**
+
+  再实现重复的数据请求中使用
+
+```
+  function getData() {
+    const [data, setdata] = useState(null)
+
+    useEffect(() => {
+      axios('/a/b').then(res => {
+        setdata(res.data)
+      })
+    }, [])
+
+    return data
+  }
+
+  // 在别的函数组件中直接调用即可获取到数据【当然加入第二参数是为了防止数据更新的时候再次触犯请求数据执行】【灵活 的写法有很多种】
+  
+```
+
+
+##  注意事项
+
+- 不可以在hooks中使用条件语句【会影响hooks的调用规则（顺序）】，会导致调用混乱，产生bug
+- 如果我们想执行一个判断可以将其放在内部来使用
+
+```
+  useEffect(() => {
+    // 将条件语句放置在hooks中
+    if (val != '') {
+      document.title = val
+    }
+  })
+
+```
+
+- 我们可以去自定义hooks，但我们自定义的hooks必须以use开头，这是一种约定，它可以识别我们是否遵循了规范，他是hooks的规范，不是react的
+
+## 💕 useContent
+
+**可以使用useContext进行跨组件传值**
+
+```
+
+  // 父组件
+  import React, {useState} from 'react'
+  export const myContent = React.createContext(null)
+  function Content() {
+    const [val, setval] = useState(myContent)
+    return (
+      <>
+        <input val = {val} onChange((e) => {setval(e.target.value)})/>
+        <myContent.Provider>
+          <Ptemp></Ptemp>
+        <myContent.Provider>
+      </>
+    )
+  }
+  export default Content
+
+  // 子组件
+
+  import React, {useContext} from 'react'
+  import {myContent} from './home'
+  function Ptemp() {
+    const val = useContext(myContent)
+
+    return (
+      <>
+        <p>{val}</p>
+      </>
+    )
+  }
+  
+```
+
+## 🍭 useReducer
