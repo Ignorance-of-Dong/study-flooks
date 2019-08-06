@@ -163,3 +163,67 @@
 ```
 
 ## 🍭 useReducer
+
+**useReducer是useState的另一种替代，他接收(state, action) => newState, 并且返回了一个与当前state成对的dispatch方法
+
+### 例1：最小的简单模式【计数器】
+
+```
+  reducer.ts
+  
+  export const initialState = 0
+  const renducer = (state, action) => {
+    switch(action) {
+      case 'count':
+        console.log(state)
+        return state + 1
+    }
+  }
+
+  export default renducer
+
+  PgReducer.tsx
+
+  import React, {useState, useReducer} from 'react'
+
+  import renducer, {initialState} from '../../renducer/expamel'
+
+  function testRenducer() {
+    const [count, dispatch] = useReducer(renducer, initialState)
+    return (
+      <>
+        <p>{count}</p>
+        <p onClick={() => {dispatch('count')}}>+</p>
+      </>
+    )
+  }
+
+  export default testRenducer
+
+```
+
+## ⚽ useRef
+
+**useRef返回一个可变的ref对象其.current属性被初始化为传入参数，返回的ref对象在组件的整个生命周期内保持不变**
+
+- 常见的就是访问子组件
+- 获取一些dom元素的参数
+
+```
+  import React, { useState, useRef, useEffect } from 'react'
+
+  function PgRef() {
+    const ulRef = useRef(null)
+    useEffect(() => {
+      console.log(ulRef.current.offsetHeight)
+    })
+    return (
+      <>
+        <p className='testP' ref={ulRef}></p>
+      </>
+    )
+  }
+
+  export default PgRef
+
+```

@@ -2,14 +2,14 @@
  * @Author: Mr.zheng
  * @Date: 2019-07-16 09:54:09
  * @LastEditors: OBKoro1
- * @LastEditTime: 2019-08-01 17:37:38
+ * @LastEditTime: 2019-08-06 10:36:02
  * @Description: 测试高级语法
  */
 import './style/index.css'
 import './style/index.scss'
 import * as ReactDOM from 'react-dom';
 import * as React from 'react'
-import IntegerStep from './c'
+import IntegerStep from './app'
 
 
 
