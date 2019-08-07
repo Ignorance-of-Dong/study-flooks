@@ -6,34 +6,47 @@
 
 
 
-## Hook简介
+## 🔥 Hook简介
 
 > Hook是react16.8的新增特性，可以在不编写class类的情况下使用state以及react的其他特性
+> React Hooks要解决的问题是状态共享，不会产生jsx嵌套问题
+
+## 🏆 Hooks的运行规则
+
+- 不能再循环中，条件语句和嵌套函数中调用hooks
+- 只在react中函数组件中的hooks
+
+## 🌟 React Hooks的特点
+
+- 多个状态不会产生嵌套
+- Hooks还可以引用其他Hooks
+- 更容易【更清晰】将组件的UI和状态进行分离
+- Hooks函数必须使用‘use’命名开头
 
 ## 📌 State Hook
 
-  ```
-    import React, { useState } from 'react';
+```
+  import React, { useState } from 'react';
 
-    function Example() {
-      // 声明一个叫 “count” 的 state 变量。
-      const [count, setCount] = useState(0); // 使用useState来定义state [参数名字, 改变参数的方法]
+  function Example() {
+    // 声明一个叫 “count” 的 state 变量。
+    const [count, setCount] = useState(0); // 使用useState来定义state [参数名字, 改变参数的方法]
 
-      // 也可以多个声明state 【但是必须保证调用的顺序一样】
+    // 也可以多个声明state 【但是必须保证调用的顺序一样】
 
-      const [tods, settods] = useState('this is count')
+    const [tods, settods] = useState('this is count')
 
-      return (
-        <div>
-          <p>You clicked {count} times</p>
-          <button onClick={() => setCount(count + 1)}>
-            Click me
-          </button>
-        </div>
-      );
-    }
+    return (
+      <div>
+        <p>You clicked {count} times</p>
+        <button onClick={() => setCount(count + 1)}>
+          Click me
+        </button>
+      </div>
+    );
+  }
 
-  ```
+```
 
 - 函数组件会有特殊的处理方式
 - 在render阶段，再将函数Fiber内容的实例化的时候去处理全局中的Hooks对象的指向
@@ -47,36 +60,36 @@
 
 ### 实现componentDidMount 副作用函数
 
-  ```
-    useEffect(() => {
-      // 使用浏览器的 API 更新页面标题
-      document.title = `You clicked ${count} times`;
-    });
+```
+  useEffect(() => {
+    // 使用浏览器的 API 更新页面标题
+    document.title = `You clicked ${count} times`;
+  });
 
-  ```
+```
 
 ### 实现componentDidUpdate 副作用函数
 
-  ```
-    useEffect(() => {
-      // 使用浏览器的 API 更新页面标题
-      document.title = `You clicked ${count} times`;
-    }, [count]); // 只在count发生改变的情况下调用
+```
+  useEffect(() => {
+    // 使用浏览器的 API 更新页面标题
+    document.title = `You clicked ${count} times`;
+  }, [count]); // 只在count发生改变的情况下调用
 
-  ```
+```
 
 ### 实现componentWillUnmount 副作用函数
 
-  ```
-    useEffect(() => {
-      // 使用浏览器的 API 更新页面标题
-      document.title = `You clicked ${count} times`;
-      return () => {
-        // 清除副作用操作
-      }
-    });
-  
-  ```
+```
+  useEffect(() => {
+    // 使用浏览器的 API 更新页面标题
+    document.title = `You clicked ${count} times`;
+    return () => {
+      // 清除副作用操作
+    }
+  });
+
+```
 - userEffect的执行时机都发生在每次渲染之后，无论首次渲染还是更新渲染
 - userEffect只有在函数组件中执行，不能再非函数组件中执行
 - userEffect可以在函数组件中执行多次，是按调用顺序执行的
@@ -107,7 +120,7 @@
 ```
 
 
-##  注意事项
+## 🔐 注意事项
 
 - 不可以在hooks中使用条件语句【会影响hooks的调用规则（顺序）】，会导致调用混乱，产生bug
 - 如果我们想执行一个判断可以将其放在内部来使用
@@ -227,3 +240,74 @@
   export default PgRef
 
 ```
+
+## 🏹 原理实现
+
+### 🔨 useState
+
+**首先我们来看一下useState的调用方式**
+
+```
+  const [count, setCount] = useState(0)
+
+```
+------------------------------------------------------------
+
+> 实现
+
+```
+  let memoizedState = [] // memoizedState存储状态的数组
+  let curson = 0 // 当前memoizedState的下标
+  function useState(ininvalState) {
+    memoizedState[curson] = memoizedState[curson] || ininvalState
+    function setState(newState) {
+      memoizedState[curson] = newState
+      render()
+    }
+    return [memoizedState[curson++], setState] // 每个hooks调用都会递增curson, 从当前组件中取出状态
+  }
+
+```
+> 只是简单 的实现了一下useState
+
+### 🔨 useEffect
+
+**首先我们来看一下useEffect的调用方式**
+
+```
+  useEffect(() => {
+    console.log(count)
+  }, [count])
+
+```
+> 实现
+
+**useEffect存在两个参数（callback, dep数组），如果dep数组不存在的话，每次render函数执行后，都会去执行callback函数，如果dep数组存在的时候，当dep发生改变的时候callback才会去执行**
+
+```
+  let memoizedState = []; // hooks 存放在这个数组
+  let cursor = 0; // 当前 memoizedState 下标
+  function useEffect(callback, dep) {
+    const hasDeps = !dep // 是否有dep数组
+    const deps = memoizedState[cursor]
+    const hasChangeDeps = deps ? !dep.every((el, i ) => el === deps[i]) : true
+    if (hasDeps || hasChangeDeps) {
+      callback();
+      memoizedState[cursor] = dep
+    }
+    cursor++;
+  }
+
+```
+> 只是简单 的实现了一下useEffect, 在react调用会有自己的调用机制
+> react中是通过单链表的方式来代替数组的，通过next来串联所有的hooks的
+
+## 🔫 原理链接 https://juejin.im/post/5c99a75af265da60ef635898#comment
+
+## 🛡 Hooks队列
+
+- 在初次渲染的时候，他的初始状态会被创建
+- 他的状态可以在运行的时候进行更改
+- react可以在后续的渲染中记住hooks的状态
+- react可以根据调用的顺序提供给你正确的状态
+- react知道当前的hooks属于哪个部分
